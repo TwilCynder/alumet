@@ -26,6 +26,7 @@ plugin-relay = { path = "../plugin-relay", optional = true }
 plugin-procfs = { path = "../plugin-procfs", optional = true }
 plugin-cgroupv2 = { path = "../plugin-cgroupv2", optional = true }
 plugin-influxdb = { path = "../plugin-influxdb", optional = true }
+plugin-test = { path = "../plugin-test", optional = true }
 
 [features]
 # local non-relay mode for x86 processors
@@ -35,6 +36,7 @@ local_x86 = [
     "dep:plugin-procfs",
     "dep:plugin-csv",
     "dep:plugin-socket-control",
+    "dep:plugin-test"
 ]
 
 # relay mode
