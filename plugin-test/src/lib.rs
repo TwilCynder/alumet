@@ -1,6 +1,15 @@
-use alumet::plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable};
+use std::time::Duration;
 
-pub struct ExamplePlugin;
+use alumet::{pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}, units::Unit};
+use config::Config;
+use source::ExampleSource;
+
+mod source;
+mod config;
+
+pub struct ExamplePlugin {
+    config: Config,
+}
 
 impl AlumetPlugin for ExamplePlugin {
     fn name() -> &'static str {
@@ -12,15 +21,22 @@ impl AlumetPlugin for ExamplePlugin {
     }
 
     fn default_config() -> anyhow::Result<Option<ConfigTable>> {
-        Ok(None) // no config for the moment
+        Ok(Some(serialize_config(Config::default())?)) // no config for the moment
     }
 
     fn init(config: ConfigTable) -> anyhow::Result<Box<Self>> {
-        Ok(Box::new(ExamplePlugin))
+        let config = deserialize_config(config)?;
+        Ok(Box::new(ExamplePlugin {
+            config
+        }))
     }
 
     fn start(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
         log::info!("Hello!");
+        let counter_metric = alumet.create_metric::<u64>("test_source_counter", Unit::Unity, "Number of time the test source has been called")?;
+        let source = ExampleSource::new(counter_metric);
+        let trigger = trigger::builder::time_interval(self.config.poll_interval).build()?;
+        alumet.add_source(Box::new(source), trigger);
         Ok(())
     }
 
