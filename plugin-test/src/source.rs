@@ -8,7 +8,7 @@ pub struct ExampleSource {
 impl ExampleSource {
     pub fn new(metric: TypedMetricId<u64>) -> ExampleSource {
         ExampleSource {
-            metric: metric,
+            metric,
             count: 0
         }
     }

@@ -1,10 +1,14 @@
-use std::time::Duration;
+use std::{fs::File, io::BufWriter};
 
-use alumet::{pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}, units::Unit};
+use alumet::{metrics::MetricId, pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}, units::Unit};
 use config::Config;
+use output::ExampleOutput;
 use source::ExampleSource;
+use transform::ExampleTransform;
 
 mod source;
+mod transform;
+mod output;
 mod config;
 
 pub struct ExamplePlugin {
@@ -37,6 +41,20 @@ impl AlumetPlugin for ExamplePlugin {
         let source = ExampleSource::new(counter_metric);
         let trigger = trigger::builder::time_interval(self.config.poll_interval).build()?;
         alumet.add_source(Box::new(source), trigger);
+        
+        let diff_metric = alumet.create_metric("test_counter_diff", Unit::Unity, "number of times the example source has been called since the previous measurement")?;
+        let transform = ExampleTransform::new(diff_metric, counter_metric.untyped_id());
+        alumet.add_transform(Box::new(transform));
+        
+        // Open the file and writer
+        let writer = BufWriter::new(File::create(self.config.out_file.clone())?);
+
+        // Create the output
+        let output = ExampleOutput::new(writer);
+
+        // Add the output to the measurement pipeline
+        alumet.add_blocking_output(Box::new(output));
+
         Ok(())
     }
 
