@@ -29,6 +29,11 @@ plugin-influxdb = { path = "../plugin-influxdb", optional = true }
 
 [features]
 # local non-relay mode for x86 processors
+local_test = [
+    "dep:plugin-csv",
+    "dep:plugin-socket-control",
+]
+
 local_x86 = [
     "dep:plugin-rapl",
     "dep:plugin-perf",
@@ -53,6 +58,10 @@ relay_server = [
     "dep:plugin-csv",
     "dep:plugin-influxdb"
 ]
+
+[[bin]]
+name = "test"
+required-features = ["local_test"]
 
 [[bin]]
 name = "alumet-local-agent"
