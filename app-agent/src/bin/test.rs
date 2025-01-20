@@ -15,7 +15,9 @@ use serde::{Deserialize, Serialize};
 fn main() {
     // Specify here all the plugins that will be included in the agent during compilation.
     let plugins = static_plugins![
-        plugin::CsvPlugin,
+        plugin_csv::CsvPlugin,
+        plugin_socket_control::SocketControlPlugin,
+        plugin_mojitos::MojitOSPlugin
     ];
 
     init_logger();

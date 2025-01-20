@@ -1,4 +1,5 @@
 use alumet::plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable};
+use cpu_temp::CPUTempSource;
 
 mod cpu_temp;
 
@@ -25,6 +26,10 @@ impl AlumetPlugin for MojitOSPlugin {
         log::info!("Hello!");
 
         //CPU Temp
+        cpu_temp::create_metric(alumet)?;
+
+        let source = CPUTempSource::new();
+        source.init(alumet)?;
 
         Ok(())
     }
