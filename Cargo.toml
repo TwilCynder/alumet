@@ -19,7 +19,8 @@ members = [
     "plugin-socket-control",
     "plugin-mongodb",
     "test-dynamic-plugin-rust",
-    "test-dynamic-plugins", "plugin-mojitos", 
+    "test-dynamic-plugins", 
+    "plugin-mojitos", 
 ]
 
 # To apply the following lint settings to a workspace member,
