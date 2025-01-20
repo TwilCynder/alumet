@@ -5,4 +5,5 @@ app-*/*.coz
 app-*/perf.data
 app-*/perf.data.old
 app-*/*output.csv
+app-*/*config*
 .DS_Store
