@@ -3,11 +3,6 @@ use std::{char, fs::{self, File}, io::{Read, Seek, SeekFrom}, num};
 use alumet::{measurement::MeasurementPoint, metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, units::{PrefixedUnit, Unit}};
 use log::info;
 
-pub fn create_metric(alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
-    let metric = alumet.create_metric::<u64>("mojitos_cpu_temp", PrefixedUnit::milli(Unit::DegreeCelsius), "Temperature in the CPU")?;
-    Ok(())
-}
-
 struct TemperatureSensor {
     file: File,
     metric: TypedMetricId<u64>
@@ -59,7 +54,7 @@ impl CPUTempSource {
 
                     log::info!("{s}");
                     let metric = alumet.create_metric::<u64>(
-                        format!("Temp_{key}_{s}"), 
+                        format!("mojitos_temp_{key}_{s}"), 
                         PrefixedUnit::milli(Unit::DegreeCelsius), 
                         format!("Temperature for {s}")
                     )?;

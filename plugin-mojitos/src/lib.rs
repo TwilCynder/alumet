@@ -1,11 +1,15 @@
 use std::time::Duration;
 
-use alumet::{pipeline::trigger, plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}};
+use alumet::{pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}};
+use config::Config;
 use cpu_temp::CPUTempSource;
 
 mod cpu_temp;
+mod config;
 
-pub struct MojitOSPlugin;
+pub struct MojitOSPlugin {
+    config: Config
+}
 
 impl AlumetPlugin for MojitOSPlugin {
     fn name() -> &'static str {
@@ -17,23 +21,20 @@ impl AlumetPlugin for MojitOSPlugin {
     }
 
     fn default_config() -> anyhow::Result<Option<ConfigTable>> {
-        Ok(None) // no config for the moment
+        Ok(Some(serialize_config(Config::default())?)) // no config for the moment
     }
 
     fn init(config: ConfigTable) -> anyhow::Result<Box<Self>> {
-        Ok(Box::new(MojitOSPlugin))
+        Ok(Box::new(MojitOSPlugin{config: deserialize_config(config)?}))
     }
 
     fn start(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
         log::info!("Hello!");
 
-        //CPU Temp
-        cpu_temp::create_metric(alumet)?;
-
         let mut source = CPUTempSource::new();
         source.init(alumet)?;
-        
-        let trigger = trigger::builder::time_interval(Duration::from_secs(1)).build()?;
+
+        let trigger = trigger::builder::time_interval(self.config.poll_interval).build()?;
 
         alumet.add_source(Box::new(source), trigger);
 
