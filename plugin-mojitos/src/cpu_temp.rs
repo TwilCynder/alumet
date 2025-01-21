@@ -1,6 +1,7 @@
-use std::{char, fs::{self, File}};
+use std::{char, fs::{self, File}, io::{Read, Seek, SeekFrom}, num};
 
-use alumet::{metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, units::{PrefixedUnit, Unit}};
+use alumet::{measurement::MeasurementPoint, metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, units::{PrefixedUnit, Unit}};
+use log::info;
 
 pub fn create_metric(alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
     let metric = alumet.create_metric::<u64>("mojitos_cpu_temp", PrefixedUnit::milli(Unit::DegreeCelsius), "Temperature in the CPU")?;
@@ -23,11 +24,15 @@ impl CPUTempSource {
         }
     }
 
-    pub fn init(&self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
+    fn add_sensor(&mut self, file: File, metric: TypedMetricId<u64>){
+        self.sensors.push(TemperatureSensor { file, metric });
+    }
+
+    pub fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
         self.init_sensors(alumet)
     }
 
-    fn init_sensors(&self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
+    fn init_sensors(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
         let mut id_rep = 0;
         let mut key = 0;
         loop {
@@ -58,6 +63,11 @@ impl CPUTempSource {
                         PrefixedUnit::milli(Unit::DegreeCelsius), 
                         format!("Temperature for {s}")
                     )?;
+
+                    let file = File::open(format!("/sys/class/hwmon/hwmon{id_rep}/temp{i}_input"))?;
+
+                    self.add_sensor(file, metric);
+
                     i+=1;
                 }
 
@@ -69,8 +79,30 @@ impl CPUTempSource {
     }
 }
 
+fn parse_int (str: String) -> u64 {
+    let mut res: u64 = 0;
+    for char in str.chars() {
+        match char.to_digit(10){
+            Some(n) => res = res * 10 + u64::from(n),
+            None => break,
+        }
+    };
+    res
+}
+
 impl Source for CPUTempSource {
     fn poll(&mut self, measurements: &mut alumet::measurement::MeasurementAccumulator, timestamp: alumet::measurement::Timestamp) -> Result<(), alumet::pipeline::elements::error::PollError> {
+        for sensor in self.sensors.iter_mut() {
+            let mut buf = String::new();
+            sensor.file.seek(SeekFrom::Start(0))?;
+            sensor.file.read_to_string(&mut buf)?;
+            let value = parse_int(buf);
+            measurements.push(MeasurementPoint::new(
+                timestamp, sensor.metric, 
+                alumet::resources::Resource::LocalMachine, alumet::resources::ResourceConsumer::LocalMachine, 
+                value
+            ));
+        };
         Ok(())
     }
 }

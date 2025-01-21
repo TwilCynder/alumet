@@ -1,4 +1,6 @@
-use alumet::plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable};
+use std::time::Duration;
+
+use alumet::{pipeline::trigger, plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}};
 use cpu_temp::CPUTempSource;
 
 mod cpu_temp;
@@ -28,8 +30,12 @@ impl AlumetPlugin for MojitOSPlugin {
         //CPU Temp
         cpu_temp::create_metric(alumet)?;
 
-        let source = CPUTempSource::new();
+        let mut source = CPUTempSource::new();
         source.init(alumet)?;
+        
+        let trigger = trigger::builder::time_interval(Duration::from_secs(1)).build()?;
+
+        alumet.add_source(Box::new(source), trigger);
 
         Ok(())
     }
