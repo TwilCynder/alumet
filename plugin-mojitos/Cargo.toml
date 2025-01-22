@@ -9,6 +9,7 @@ anyhow = "1.0.95"
 humantime-serde = "1.1.1"
 log = "0.4.25"
 serde = { version = "1.0.217", features = ["derive"] }
+sysinfo_dot_h = "0.2.1"
 
 [lints]
 workspace = true

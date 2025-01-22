@@ -15,10 +15,10 @@ pub struct CPUTempSource {
 }
 
 impl MojitOSSource for CPUTempSource {
-    fn new() -> Self {
-        Self {
+    fn new(_: &mut AlumetPluginStart) -> anyhow::Result<Self>{
+        Ok(Self {
             sensors: Vec::new()
-        }
+        })
     }
 
     fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
@@ -30,8 +30,6 @@ impl CPUTempSource {
     fn add_sensor(&mut self, file: File, metric: TypedMetricId<u64>){
         self.sensors.push(TemperatureSensor { file, metric });
     }
-
-
 
     fn init_sensors(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
         let mut id_rep = 0;

@@ -1,6 +1,6 @@
-use alumet::plugin::AlumetPluginStart;
+use alumet::{pipeline::Source, plugin::AlumetPluginStart};
 
-pub trait MojitOSSource {
+pub trait MojitOSSource: Source where Self:Sized {
     fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>;
-    fn new() -> Self;
+    fn new(alumet: &mut AlumetPluginStart) -> anyhow::Result<Self>;
 }
