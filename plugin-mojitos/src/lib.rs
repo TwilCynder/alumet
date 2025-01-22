@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use alumet::{pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}};
 use config::Config;
 use cpu_temp::CPUTempSource;

@@ -1,7 +1,6 @@
-use std::{char, fs::{self, File}, io::{Read, Seek, SeekFrom}, num};
+use std::{fs::{self, File}, io::{Read, Seek, SeekFrom}};
 
 use alumet::{measurement::MeasurementPoint, metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, units::{PrefixedUnit, Unit}};
-use log::info;
 
 struct TemperatureSensor {
     file: File,
@@ -65,7 +64,6 @@ impl CPUTempSource {
 
                     i+=1;
                 }
-
                 key += 1;
             }
             id_rep+=1;
@@ -74,7 +72,7 @@ impl CPUTempSource {
     }
 }
 
-fn parse_int (str: String) -> u64 {
+fn parse_u64 (str: String) -> u64 {
     let mut res: u64 = 0;
     for char in str.chars() {
         match char.to_digit(10){
@@ -91,7 +89,7 @@ impl Source for CPUTempSource {
             let mut buf = String::new();
             sensor.file.seek(SeekFrom::Start(0))?;
             sensor.file.read_to_string(&mut buf)?;
-            let value = parse_int(buf);
+            let value = parse_u64(buf);
             measurements.push(MeasurementPoint::new(
                 timestamp, sensor.metric, 
                 alumet::resources::Resource::LocalMachine, alumet::resources::ResourceConsumer::LocalMachine, 
