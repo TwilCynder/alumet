@@ -2,6 +2,9 @@ use std::{fs::{self, File}, io::{Read, Seek, SeekFrom}};
 
 use alumet::{measurement::MeasurementPoint, metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, units::{PrefixedUnit, Unit}};
 
+use crate::mojitos_source::MojitOSSource;
+
+
 struct TemperatureSensor {
     file: File,
     metric: TypedMetricId<u64>
@@ -11,20 +14,24 @@ pub struct CPUTempSource {
     sensors: Vec<TemperatureSensor>
 }
 
-impl CPUTempSource {
-    pub fn new() -> Self {
+impl MojitOSSource for CPUTempSource {
+    fn new() -> Self {
         Self {
             sensors: Vec::new()
         }
     }
 
+    fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
+        self.init_sensors(alumet)
+    }
+}
+
+impl CPUTempSource {
     fn add_sensor(&mut self, file: File, metric: TypedMetricId<u64>){
         self.sensors.push(TemperatureSensor { file, metric });
     }
 
-    pub fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
-        self.init_sensors(alumet)
-    }
+
 
     fn init_sensors(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()>{
         let mut id_rep = 0;
