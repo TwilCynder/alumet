@@ -1,6 +1,7 @@
 mod mojitos_source;
 mod cpu_temp;
 mod memory;
+mod network;
 mod config;
 
 use std::time::Duration;
@@ -26,7 +27,6 @@ fn create_trigger(interval: Duration) -> anyhow::Result<TriggerSpec> {
 fn add_source<S: MojitOSSource + 'static>(alumet: &mut AlumetPluginStart, trigger: TriggerSpec) -> anyhow::Result<()> {
     let source = S::new(alumet)?;
     alumet.add_source(Box::new(source), trigger);
-
     Ok(())
 }
 
