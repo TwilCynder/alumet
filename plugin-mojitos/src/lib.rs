@@ -24,8 +24,7 @@ fn create_trigger(interval: Duration) -> anyhow::Result<TriggerSpec> {
 }
 
 fn add_source<S: MojitOSSource + 'static>(alumet: &mut AlumetPluginStart, trigger: TriggerSpec) -> anyhow::Result<()> {
-    let mut source = S::new(alumet)?;
-    source.init(alumet)?;
+    let source = S::new(alumet)?;
     alumet.add_source(Box::new(source), trigger);
 
     Ok(())

@@ -1,4 +1,4 @@
-use std::{mem::MaybeUninit, ptr};
+use std::mem::MaybeUninit;
 
 use alumet::{measurement::{MeasurementAccumulator, MeasurementPoint, Timestamp}, metrics::TypedMetricId, pipeline::Source, plugin::AlumetPluginStart, resources::{Resource, ResourceConsumer}, units::Unit};
 use sysinfo_dot_h::sysinfo;
@@ -34,10 +34,6 @@ fn create_sensor(alumet: &mut alumet::plugin::AlumetPluginStart, label: &'static
 }
 
 impl MojitOSSource for MemorySource {
-    fn init(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
-        Ok(())
-    }
-
     fn new(alumet: &mut AlumetPluginStart) -> anyhow::Result<Self> {
         Ok(MemorySource{sensors: MemorySensors {  
             totalram: create_sensor(alumet, "totalram")?,
