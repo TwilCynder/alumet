@@ -16,6 +16,7 @@ fn main() {
     // Specify here all the plugins that will be included in the agent during compilation.
     let plugins = static_plugins![
         plugin_csv::CsvPlugin,
+        plugin_mojitos_c::MojitOSCPlugin
     ];
 
     init_logger();

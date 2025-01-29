@@ -1,0 +1,12 @@
+[package]
+name = "plugin-mojitos-c"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alumet = { version = "0.7.0", path = "../alumet" }
+anyhow = "1.0.95"
+log = "0.4.25"
+
+[lints]
+workspace = true
