@@ -10,3 +10,6 @@ log = "0.4.25"
 
 [lints]
 workspace = true
+
+[build-dependencies]
+cc = "1.2.10"

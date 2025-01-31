@@ -1,5 +1,9 @@
 use alumet::plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable};
 
+extern "C" {
+    fn sum(a: u64, b: u64) -> u64;
+}
+
 pub struct MojitOSCPlugin;
 
 impl AlumetPlugin for MojitOSCPlugin {
@@ -21,6 +25,11 @@ impl AlumetPlugin for MojitOSCPlugin {
 
     fn start(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
         log::info!("Hello!");
+
+        unsafe  {
+            log::info!("{}", sum(12, 15))
+        }
+
         Ok(())
     }
 
