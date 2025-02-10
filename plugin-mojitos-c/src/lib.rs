@@ -1,41 +1,20 @@
-use std::time::Duration;
 
-use alumet::{measurement::{MeasurementAccumulator, MeasurementPoint}, metrics::TypedMetricId, pipeline::{trigger, Source}, plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}, units::Unit};
+use alumet::{pipeline::trigger, plugin::{rust::{deserialize_config, serialize_config, AlumetPlugin}, AlumetPluginStart, ConfigTable}, units::Unit};
+use config::Config;
 use mojitos::clean;
 
 mod mojitos;
+mod config;
 
-struct MojitOSSource {
-    metrics: Vec<TypedMetricId<u64>>,
+mod source;
+
+pub struct MojitOSCPlugin {
+    config: Config
 }
-
-impl Source for MojitOSSource {
-    fn poll(&mut self, measurements: &mut alumet::measurement::MeasurementAccumulator, timestamp: alumet::measurement::Timestamp) -> Result<(), alumet::pipeline::elements::error::PollError> {
-        unsafe {
-            let mut res = mojitos::get_values();
-            for i in 0..self.metrics.len() {
-                let point = MeasurementPoint::new(
-                    timestamp, 
-                    self.metrics[i], 
-                    alumet::resources::Resource::LocalMachine, 
-                    alumet::resources::ResourceConsumer::LocalMachine,
-                    *res
-                );
-                measurements.push(point);
-
-                res = res.add(1);
-            };
-
-        }
-        Ok(())
-    }
-}
-
-pub struct MojitOSCPlugin;
 
 impl AlumetPlugin for MojitOSCPlugin {
     fn name() -> &'static str {
-        "example" // the name of your plugin, in lowercase, without the "plugin-" prefix
+        "mojitos" // the name of your plugin, in lowercase, without the "plugin-" prefix
     }
 
     fn version() -> &'static str {
@@ -43,11 +22,11 @@ impl AlumetPlugin for MojitOSCPlugin {
     }
 
     fn default_config() -> anyhow::Result<Option<ConfigTable>> {
-        Ok(None) // no config for the moment
+        Ok(Some(serialize_config(Config::default())?)) // no config for the moment
     }
 
     fn init(config: ConfigTable) -> anyhow::Result<Box<Self>> {
-        Ok(Box::new(MojitOSCPlugin))
+        Ok(Box::new(MojitOSCPlugin {config: deserialize_config(config)?}))
     }
 
     fn start(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
@@ -65,11 +44,11 @@ impl AlumetPlugin for MojitOSCPlugin {
                 metrics.push(alumet.create_metric::<u64>(name, Unit::Unity, "")?);
             }
 
-            let source = MojitOSSource {
+            let source = source::MojitOSSource {
                 metrics
             };
 
-            let trigger = trigger::builder::time_interval(Duration::from_secs(1)).build()?;
+            let trigger = trigger::builder::time_interval(self.config.poll_interval).build()?;
 
             alumet.add_source(Box::new(source), trigger);
         }
