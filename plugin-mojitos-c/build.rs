@@ -1,4 +1,6 @@
 fn main(){
+    println!("cargo::rerun-if-changed=src/c/");
+
     bindgen::builder()
         .header("src/c/libmojitos.h")
         .blocklist_file("/usr/.*")
