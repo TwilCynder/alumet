@@ -1,7 +1,35 @@
-use alumet::{plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}, units::Unit};
+use std::time::Duration;
+
+use alumet::{measurement::{MeasurementAccumulator, MeasurementPoint}, metrics::TypedMetricId, pipeline::{trigger, Source}, plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}, units::Unit};
 use mojitos::clean;
 
 mod mojitos;
+
+struct MojitOSSource {
+    metrics: Vec<TypedMetricId<u64>>,
+}
+
+impl Source for MojitOSSource {
+    fn poll(&mut self, measurements: &mut alumet::measurement::MeasurementAccumulator, timestamp: alumet::measurement::Timestamp) -> Result<(), alumet::pipeline::elements::error::PollError> {
+        unsafe {
+            let mut res = mojitos::get_values();
+            for i in 0..self.metrics.len() {
+                let point = MeasurementPoint::new(
+                    timestamp, 
+                    self.metrics[i], 
+                    alumet::resources::Resource::LocalMachine, 
+                    alumet::resources::ResourceConsumer::LocalMachine,
+                    *res
+                );
+                measurements.push(point);
+
+                res = res.add(1);
+            };
+
+        }
+        Ok(())
+    }
+}
 
 pub struct MojitOSCPlugin;
 
@@ -30,10 +58,20 @@ impl AlumetPlugin for MojitOSCPlugin {
             let nb = mojitos::init((args.as_mut_ptr())as *mut *mut i8);
             let labels = mojitos::get_labels();
 
+            let mut metrics = Vec::new();
+
             for i in 0..nb {
                 let name = String::from("mojitos_") + std::ffi::CStr::from_ptr(*labels.add(i as usize)).to_str()? ;
-                alumet.create_metric::<u64>(name, Unit::Unity, "")?;
+                metrics.push(alumet.create_metric::<u64>(name, Unit::Unity, "")?);
             }
+
+            let source = MojitOSSource {
+                metrics
+            };
+
+            let trigger = trigger::builder::time_interval(Duration::from_secs(1)).build()?;
+
+            alumet.add_source(Box::new(source), trigger);
         }
         Ok(())
     }
