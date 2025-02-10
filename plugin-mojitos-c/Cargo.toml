@@ -10,3 +10,6 @@ log = "0.4.25"
 
 [lints]
 workspace = true
+
+[build-dependencies]
+bindgen = "0.71.1"
