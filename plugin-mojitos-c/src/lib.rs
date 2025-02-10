@@ -1,4 +1,4 @@
-use alumet::plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable};
+use alumet::{plugin::{rust::AlumetPlugin, AlumetPluginStart, ConfigTable}, units::Unit};
 use mojitos::clean;
 
 mod mojitos;
@@ -26,10 +26,14 @@ impl AlumetPlugin for MojitOSCPlugin {
         log::info!("Hello!");
         unsafe {
             let mut args = [b"-c\0".as_ptr(), std::ptr::null()];
-            
+
             let nb = mojitos::init((args.as_mut_ptr())as *mut *mut i8);
             let labels = mojitos::get_labels();
 
+            for i in 0..nb {
+                let name = String::from("mojitos_") + std::ffi::CStr::from_ptr(*labels.add(i as usize)).to_str()? ;
+                alumet.create_metric::<u64>(name, Unit::Unity, "")?;
+            }
         }
         Ok(())
     }
