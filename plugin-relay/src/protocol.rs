@@ -3,7 +3,7 @@
 use std::{io, time::Duration};
 
 use alumet::{measurement::WrappedMeasurementType, metrics::RawMetricId, units::PrefixedUnit};
-use anyhow::{anyhow, Context};
+use anyhow::Context;
 use bytes::BytesMut;
 use serde::{Deserialize, Serialize};
 use tokio::{
@@ -168,6 +168,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> MessageStream<S> {
         Ok(())
     }
 
+    #[allow(unused)]
     pub async fn read_timeout(&mut self, timeout: Duration) -> Result<Result<MessageBody<'static>, Error>, Elapsed> {
         tokio::time::timeout(timeout, self.read_message()).await
     }
@@ -263,6 +264,7 @@ impl MessageStream<TcpStream> {
         self.stream.peer_addr()
     }
 
+    #[allow(unused)]
     pub fn local_addr(&self) -> Result<std::net::SocketAddr, std::io::Error> {
         self.stream.local_addr()
     }

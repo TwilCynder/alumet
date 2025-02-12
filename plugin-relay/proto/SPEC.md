@@ -1,3 +1,0 @@
-# Alumet relay protocol
-
-- 
