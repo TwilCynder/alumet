@@ -24,6 +24,7 @@ plugin-csv = { path = "../plugin-csv" }
 plugin-influxdb = { path = "../plugin-influxdb" }
 plugin-relay = { path = "../plugin-relay" }
 plugin-mongodb = { path = "../plugin-mongodb" }
+plugin-mojitos-c = { path = "../plugin-mojitos-c" }
 
 
 # Linux-only dependencies
