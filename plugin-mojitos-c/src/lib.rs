@@ -33,7 +33,7 @@ impl AlumetPlugin for MojitOSCPlugin {
         log::info!("Hello!");
         unsafe {
 
-            let mut args_string = self.config.arguments.clone();
+            let mut args_string = self.config.arguments.clone() + " ";
 
             let mut was_whitespace = true;
             let mut args = Vec::new();
