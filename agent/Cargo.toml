@@ -25,6 +25,7 @@ plugin-influxdb = { path = "../plugin-influxdb" }
 plugin-relay = { path = "../plugin-relay" }
 plugin-mongodb = { path = "../plugin-mongodb" }
 
+
 # Linux-only dependencies
 [target.'cfg(target_os = "linux")'.dependencies]
 plugin-cgroupv2 = { path = "../plugin-cgroupv2" }
@@ -34,6 +35,7 @@ plugin-perf = { path = "../plugin-perf" }
 plugin-procfs = { path = "../plugin-procfs" }
 plugin-rapl = { path = "../plugin-rapl" }
 plugin-socket-control = { path = "../plugin-socket-control" }
+plugin-mojitos-c = { path = "../plugin-mojitos-c" }
 
 [[bin]]
 name = "alumet-agent"
