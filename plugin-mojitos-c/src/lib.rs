@@ -32,13 +32,31 @@ impl AlumetPlugin for MojitOSCPlugin {
     fn start(&mut self, alumet: &mut AlumetPluginStart) -> anyhow::Result<()> {
         log::info!("Hello!");
         unsafe {
-            let mut args = [b"-c\0".as_ptr(), std::ptr::null()];
+
+            let mut args_string = self.config.arguments.clone();
+
+            let mut was_whitespace = true;
+            let mut args = Vec::new();
+            for c in args_string.as_bytes_mut() {
+                if was_whitespace {
+                    if !c.is_ascii_whitespace() {
+                        was_whitespace = false;
+                        args.push(c as *mut u8);
+                    }
+                } else if c.is_ascii_whitespace() {
+                    was_whitespace = true;
+                    *c = '\0' as u8;
+                }
+            }
+            args.push(std::ptr::null_mut::<u8>());
 
             let nb = mojitos::init((args.as_mut_ptr())as *mut *mut i8);
-            let labels = mojitos::get_labels();
+            if nb < 1 {
+                log::warn!("MojitOS : none of the mojitos sensors were activated, nothing will be measured. Consider changing the mojitos arguments in the config")
+            }
 
             let mut metrics = Vec::new();
-
+            let labels = mojitos::get_labels();
             for i in 0..nb {
                 let name = String::from("mojitos_") + std::ffi::CStr::from_ptr(*labels.add(i as usize)).to_str()? ;
                 metrics.push(alumet.create_metric::<u64>(name, Unit::Unity, "")?);

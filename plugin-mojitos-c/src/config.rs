@@ -6,10 +6,11 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     #[serde(with = "humantime_serde")]
     pub poll_interval: Duration,
+    pub arguments: std::string::String
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { poll_interval: Duration::from_secs(1) }
+        Self { poll_interval: Duration::from_secs(1), arguments: "".to_owned() }
     }
 }
