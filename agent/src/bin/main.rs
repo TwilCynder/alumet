@@ -24,10 +24,10 @@ fn load_plugins_metadata() -> Vec<PluginMetadata> {
     // plugins that work on every target
     let mut plugins = static_plugins![
         plugin_csv::CsvPlugin,
-        plugin_influxdb::InfluxDbPlugin,
-        plugin_mongodb::MongoDbPlugin,
-        plugin_relay::client::RelayClientPlugin,
-        plugin_relay::server::RelayServerPlugin,
+        //plugin_influxdb::InfluxDbPlugin,
+        //plugin_mongodb::MongoDbPlugin,
+        //plugin_relay::client::RelayClientPlugin,
+        //plugin_relay::server::RelayServerPlugin,
     ];
 
     // plugins that only work on Linux
@@ -35,9 +35,9 @@ fn load_plugins_metadata() -> Vec<PluginMetadata> {
     {
         plugins.extend(static_plugins![
             plugin_socket_control::SocketControlPlugin,
-            plugin_cgroupv2::K8sPlugin,
+            //plugin_cgroupv2::K8sPlugin,
             plugin_cgroupv2::OARPlugin,
-            plugin_oar2::Oar2Plugin,
+            //plugin_oar2::Oar2Plugin,
             plugin_rapl::RaplPlugin,
             plugin_perf::PerfPlugin,
             plugin_procfs::ProcfsPlugin,
