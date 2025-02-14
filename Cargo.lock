@@ -2343,6 +2343,8 @@ dependencies = [
  "alumet",
  "anyhow",
  "bindgen 0.71.1",
+ "cc",
+ "glob",
  "humantime-serde",
  "log",
  "serde",
