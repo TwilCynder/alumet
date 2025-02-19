@@ -53,4 +53,16 @@ Here are the sensors that can be enabled, with the option you must add to the "a
 Note that MojitOS is not always built with all its sensors, and that this plugin relies on a MojitOS build that may have been built without all the sensors. See the "Linking MojitOS" part below for more information. 
 
 ## Linking MojitOS
-This branch does not provide a way to link MojitOS. You are most likely on the wrong branch. 
+This plugin relies on `libmojitos`, which you can obtain in various way, the most simple being to build it yourself from MojitOS's code. Keep in mind that a mojitos build can include any subset of the sensors, which is controlled by the `configure.sh` script. Running this script with no arguments like below will enable all the sensors that work on your machine. Refer to MojitOS's documentation for more information about sensor selection. 
+
+```bash
+git clone https://gitlab.irit.fr/sepia-pub/mojitos
+cd mojitos
+chmod a+x ./configure.sh
+./configure.sh
+make libmojitos
+make install
+```
+
+`libmojitos`, and its header, should be installed to `/usr/local/`, where this plugin's build system expects to find it.  
+If you wish to use a build placed in a different location, you need to modify the build.rs script. The const variables at the top control the directories where `libmojitos` and the `mojitos.h` header are expected. 
