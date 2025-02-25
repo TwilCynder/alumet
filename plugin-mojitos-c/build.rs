@@ -3,6 +3,7 @@ const LIB_DIR: &str = "/usr/local/lib/";
 
 fn main(){
     println!("cargo::rerun-if-changed=src/c/");
+    println!("cargo:rustc-link-seach={LIB_DIR}");
     println!("cargo:rustc-link-lib=mojitos");
 
 
