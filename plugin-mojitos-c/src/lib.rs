@@ -50,7 +50,10 @@ impl AlumetPlugin for MojitOSCPlugin {
             }
             args.push(std::ptr::null_mut::<u8>());
 
+            log::info!("Before mojitos init");
+
             let nb = mojitos::init((args.as_mut_ptr())as *mut *mut i8);
+            log::info!("After mojitos init");
             if nb < 1 {
                 log::warn!("MojitOS : none of the mojitos sensors were activated, nothing will be measured. Consider changing the mojitos arguments in the config")
             }
